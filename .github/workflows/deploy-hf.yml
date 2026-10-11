@@ -1,0 +1,50 @@
+# Deploys the app to a Hugging Face Space (Docker) after CI passes on main.
+# One-time setup in GitHub -> Settings -> Secrets and variables -> Actions:
+#   secret   HF_TOKEN  = a Hugging Face access token with "write" permission
+#   variable HF_SPACE  = your-hf-username/arogya
+name: Deploy to Hugging Face
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && vars.HF_SPACE != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Push a clean snapshot to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+        run: |
+          set -e
+          SNAP=$(mktemp -d)
+          rsync -a --exclude .git --exclude .github --exclude docs --exclude ml/data ./ "$SNAP"/
+          cd "$SNAP"
+          # Spaces read their settings from the README front matter
+          {
+            echo "---"
+            echo "title: Arogya"
+            echo "emoji: 🤟"
+            echo "colorFrom: indigo"
+            echo "colorTo: yellow"
+            echo "sdk: docker"
+            echo "app_port: 7860"
+            echo "pinned: false"
+            echo "short_description: Two-way Indian Sign Language doctor-patient assistant"
+            echo "---"
+            echo
+            cat README.md
+          } > README.tmp && mv README.tmp README.md
+          git init -q -b main
+          git config user.email "deploy@arogya.app"
+          git config user.name "Arogya deploy"
+          git add -A
+          git commit -qm "Deploy ${GITHUB_SHA::7}"
+          git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main
+          echo "Deployed to https://huggingface.co/spaces/${HF_SPACE}"
