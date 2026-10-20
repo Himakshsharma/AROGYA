@@ -1,5 +1,10 @@
 # Arogya · आरोग्य
 
+[![CI](https://github.com/Himakshsharma/AROGYA/actions/workflows/ci.yml/badge.svg)](https://github.com/Himakshsharma/AROGYA/actions/workflows/ci.yml)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688)
+![React](https://img.shields.io/badge/React-Three.js-61DAFB)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 **A two-way Indian Sign Language and doctor–patient communication assistant.**
 
 In a hospital, the doctor speaks and a deaf patient sees the words as text and as Indian Sign Language (ISL) signed by a 3D avatar. The patient answers by signing to the camera, tapping symptom pictures, marking pain on a body map or typing, and the doctor hears it in Hindi or English. Blind patients hear every message and get prescriptions read aloud.
@@ -142,7 +147,7 @@ frontend/
   e2e/                     Playwright tests
 ml/                        INCLUDE keypoint extraction, LSTM training, Colab notebook
 scripts/                   export_starter_templates.mjs
-docs/                      architecture, deployment, interview Q&A
+docs/                      architecture, deployment
 ```
 
 ## Limitations, honestly
